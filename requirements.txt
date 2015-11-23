@@ -15,7 +15,6 @@ psycopg2==2.6.1
 pyasn1==0.1.9
 pycparser==2.14
 pycrypto==2.6.1
-PySide==1.2.4
 python-keyczar==0.715
 requests==2.8.1
 six==1.10.0
