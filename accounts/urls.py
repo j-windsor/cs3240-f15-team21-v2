@@ -7,7 +7,6 @@ urlpatterns = [
     url(r'^login/$', views.user_login, name='login'),
     url(r'^logout/$', views.user_logout, name='logout'),
     url(r'^groups/$', views.groups, name='groups'),
-    url(r'^contributors/$', views.contributors, name='contributors'),
     url(r'^sitemanager/$', views.sitemanager, name='sitemanager'),
     url(r'^(?P<user_id>[0-9]+)/user_view/$', views.user_view, name='user_view'),
     url(r'^(?P<user_id>[0-9]+)/deactivate/$', views.deactivate, name='deactivate'),

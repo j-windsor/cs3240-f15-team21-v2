@@ -141,25 +141,6 @@ def groups(request):
         return HttpResponseRedirect('/accounts/groups')
     return render(request, 'accounts/groups.html', {})
 
-@login_required
-def contributors(request):
-    if request.method == 'POST':
-        if request.POST.get('user_name'):
-            user_name = request.POST.get('user_name')
-            contributor_name = request.POST.get('contributor_name')
-            try:
-                user = User.objects.get(username=user_name)
-                contributor = Group.objects.get(name=contributor_name)
-                user.contributors.add(contributor)
-                user.save()
-                full_name = user.first_name + " " + user.last_name
-                messages.success(request, full_name + " added as contributor!")
-            except:
-                messages.warning(request, 'User not added as contributor: Username not Found!')
-
-        return HttpResponseRedirect('accounts/contributors')
-    return render(request, 'reports/read_report.html', {})
-
 
 @user_passes_test(lambda u: u.is_superuser)
 def sitemanager(request):

@@ -4,12 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from .forms import ReportForm, AttachmentForm
-from .models import Report, Folder, Attachment
 import re
 from django.db.models import Q
 from django.template import RequestContext
-from .models import Report, Folder, Attachment, Contributor
-from django.contrib.auth.models import User
+from .models import Report, Folder, Attachment
+from django.contrib.auth.models import Group, User
 
 
 @login_required
@@ -239,20 +238,20 @@ def public(request):
     return render(request, 'reports/public.html', {'reports': reports})
 
 @login_required
-def contributors(request):
+def contributors(request, report_id):
     if request.method == 'POST':
-        user_name = request.POST.get('user_name')
-        contributor_name = request.POST.get('contributor_name')
-        try:
-            user = User.objects.get(username=user_name)
-            messages.success(request, "here i am")
-            contributor = Contributor.objects.get(name=contributor_name)
-            user.contributors.add(contributor)
-            user.save()
-            full_name = user.first_name + " " + user.last_name
-            messages.success(request, full_name + " added as contributor!")
-        except:
-            messages.warning(request, 'User not added as contributor: Username not Found!')
+        group_name = request.POST.get('group_name')
+        group = Group.objects.get(name=group_name)
+        report = Report.objects.get(id=report_id)
+        users = group.user_set.all()
+        author = request.user
+        for user in users:
+            if author != user:
+                folder = user.folder_set.get(label="Shared With Me")
+                folder.reports.add(report)
+                folder.save()
+
+        messages.success(request, "Added group members as contributors!")
 
     return HttpResponseRedirect('/')
 
