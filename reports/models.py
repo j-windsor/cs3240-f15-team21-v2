@@ -33,7 +33,17 @@ class Attachment (models.Model):
     def __str__(self):
         return self.name
     def filename(self):
-        return os.path.basename(self.file.name)
+        return os.path.basename(self.upload.path)
+    def has_access(self, user):
+        retval = False
+        try:
+            for folder in user.folder_set.all():
+                for report in folder.reports.all():
+                    if self in report.attachment_set.all():
+                        retval = True
+        except:
+            pass
+        return retval
 
 class Contributor (models.Model):
     name = models.CharField(max_length=30)
