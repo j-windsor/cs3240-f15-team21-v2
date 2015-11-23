@@ -319,6 +319,7 @@ def api_public_reports(request):
         serializer = ReportSerializer(reports, many=True)
         return Response(serializer.data)
 
+@api_view(['GET'])
 @authentication_classes((SessionAuthentication, BasicAuthentication))
 def api_download_attachment(request, attachment_id):
     thefile = Attachment.objects.get(id=attachment_id)
