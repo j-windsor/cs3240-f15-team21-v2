@@ -6,7 +6,7 @@ class AttachmentInfoSerializer(serializers.ModelSerializer):
     upload = serializers.FileField(use_url=True)
     class Meta:
         model = Attachment
-        fields = ('name', 'upload', 'encrypted', 'upload_date')
+        fields = ('name', 'upload', 'encrypted', 'upload_date', 'id')
 
 class ReportSerializer(serializers.ModelSerializer):
     attachment_set = AttachmentInfoSerializer(many=True)

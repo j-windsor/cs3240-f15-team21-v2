@@ -296,6 +296,11 @@ from .serializers import FolderSerializer, ReportSerializer
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.core.files import File
+from django.http import StreamingHttpResponse
+from django.core.servers.basehttp import FileWrapper
+import mimetypes
+import os
 
 @api_view(['GET'])
 @authentication_classes((SessionAuthentication, BasicAuthentication))
@@ -313,8 +318,14 @@ def api_public_reports(request):
         serializer = ReportSerializer(reports, many=True)
         return Response(serializer.data)
 
+@api_view(['GET'])
+@authentication_classes((SessionAuthentication, BasicAuthentication))
 def api_download_attachment(request, attachment_id):
     thefile = Attachment.objects.get(id=attachment_id)
-    response = HttpResponse(thefile.file, content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename=%s' % thefile.filename()
+    if not thefile.has_access(request.user):
+        return HttpResponse("denied")
+    wrapper = FileWrapper(open(thefile.upload.path, 'rb'))
+    thetype = mimetypes.guess_type(thefile.filename())[0] + "; charset=binary"
+    response = HttpResponse(wrapper, content_type=thetype)
+    response['Content-Disposition'] = "attachment; filename=file"
     return response
