@@ -1,0 +1,33 @@
+{% extends "master/base.html" %}
+{% block body_block %}
+<div class="well">
+  <a class="btn btn-default" href="{% url 'messages:new' %}">New Message</a>
+</div>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+      Inbox
+  </div>
+    <table class="table">
+      <tr>
+        <th>Subject</th>
+        <th>Sent By</th>
+        <th>Date Sent</th>
+        <th>Encrypted</th>
+        <th>Actions</th>
+      </tr>
+      {% for message in user.recipient.all %}
+
+      <tr>
+        <td><a href="{% url 'messages:read' message.id %}">{{ message.subject}}</a> {% if message.unread %}<span class="label label-info">UNREAD</span>{% endif %}</td>
+        <td>{{ message.sender }}</td>
+        <td>{{ message.send_date }}</td>
+        <td>{{ message.encrypted }}</td>
+        <td> <a href="{% url 'messages:delete' message.id %}">Delete</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "master/base.html" %}
+{% block body_block %}
+<div class="well">
+  <a class="btn btn-default" href="{% url 'messages:inbox' %}">Back to Inbox</a>
+  <a class="btn btn-default" href="{% url 'messages:new' %}">New Message</a>
+  <a class="btn btn-danger" href="{% url 'messages:delete' message.id %}">Delete Message</a>
+</div>
+
+<div class="page-header">
+  <h1>{{ message.subject }}  <small>Sent by {{ message.sender.username }}</small></h1>
+</div>
+{% if message.encrypted %}
+<div class="panel panel-danger">
+  <div class="panel-heading">
+    <h3 class="panel-title">This message is encrypted!</h3>
+  </div>
+  <div class="panel-body">
+    You received an email with a DES key. Please use the key in conjunction with the ciphertext below in the
+    standalone app decryption tool to see the plaintext message.
+  </div>
+</div>
+{% endif %}
+<p>{{ message.content }}</p>
+
+{% endblock %}

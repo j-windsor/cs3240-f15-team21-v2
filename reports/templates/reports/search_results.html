@@ -1,0 +1,47 @@
+{% extends "master/base.html" %}
+{% block body_block %}
+
+    {% if found_entries %}
+        <div class="panel panel-default">
+            <table class="table">
+                <tr>
+                    <th>Name</th>
+                    <th>Public</th>
+                    <th>Date Created</th>
+                    <th>Actions</th>
+                    <th>Move to...</th>
+                </tr>
+                {% for report in found_entries %}
+                    <tr>
+                        <td><a href="{% url 'reports:read_report' report.id %}">{{ report.title }}</a></td>
+                        <td>{{ report.public }}</td>
+                        <td>{{ report.create_date }}</td>
+                        <td> Delete n' stuff</td>
+                        <td>
+                            <form id="folder_move_form" method="post" action="/reports/move/">
+                                {% csrf_token %}
+                                <select name="move_to" onChange="$('#folder_move_form').submit()">
+                                    <option value="" disabled="disabled" selected="selected">Please select a folder
+                                    </option>
+                                    {% for listfold in user.folder_set.all %}
+                                        {% if listfold.label != "Shared With Me" %}
+                                            <option value="{{ listfold.id }}"> {{ listfold.label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" name="move_from" value="{{ folder.id }}">
+                                <input type="hidden" name="currep" value="{{ report.id }}">
+                            </form>
+                        </td>
+                        <td><a href="{% url "reports:edit_report" report.id %}">Edit</a></td>
+                        <td><a href="{% url "reports:delete_report" report.id %}">Delete</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+    {% endif %}
+
+{% endblock %}
+
+

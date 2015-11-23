@@ -1,0 +1,32 @@
+{% extends "master/base.html" %}
+{% block body_block %}
+    <h1>Manage Site</h1>
+<div class="panel panel-default">
+  <div class="panel-heading">
+      List of Users
+  </div>
+    <table class="table">
+      <tr>
+          <th>Name</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Active?</th>
+          <th>Site Manager?</th>
+      </tr>
+      {% for member in all_users %}
+          {% if member.username != user.username %}
+          <tr>
+            <td> <a href="{% url 'accounts:user_view' member.id %}">{{ member.username }}</a></td>
+            <td> {{ member.first_name }} </td>
+            <td> {{ member.last_name }} </td>
+            <td> {{ member.email }} </td>
+            <td> {{ member.is_active }} </td>
+            <td> {{ member.is_superuser }} </td>
+          </tr>
+          {% endif %}
+      {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

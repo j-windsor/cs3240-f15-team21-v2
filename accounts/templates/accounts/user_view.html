@@ -1,0 +1,53 @@
+{% extends "master/base.html" %}
+{% block body_block %}
+
+    <h1>{{member.first_name}} {{ member.last_name }}</h1>
+
+
+     <h3>Reports and Folders</h3>
+
+    {% for folder in member.folder_set.all %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+      {{ folder.label }}
+  </div>
+    <table class="table">
+      <tr>
+        <th>Name</th>
+        <th>Public</th>
+        <th>Date Created</th>
+        <th>Actions</th>
+      </tr>
+      {% for report in folder.reports.all %}
+      <tr>
+        <td><a href="{% url 'reports:read_report' report.id %}">{{ report.title }}</a></td>
+        <td>{{ report.public }}</td>
+        <td>{{ report.create_date }}</td>
+        <td><a href="{% url "reports:delete_report" report.id %}">Delete</a></td>
+
+      </tr>
+      {% endfor %}
+    </table>
+</div>
+{% endfor %}
+
+    <h3>Options</h3>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="well">
+                {% if member.is_active %}
+                    <a class="btn btn-default" href="{% url 'accounts:deactivate' member.id%}">Deactivate User Account</a>
+                {% endif%}
+                {% if not member.is_active %}
+                    <a class="btn btn-default" href="{% url 'accounts:activate' member.id%}">Activate User Account</a>
+                {% endif%}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="well">
+                <a class="btn btn-default" href="{% url 'accounts:makeSiteManager' member.id%}">Make Site Manager</a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

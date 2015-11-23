@@ -1,0 +1,83 @@
+{% extends "master/base.html" %}
+{% block body_block %}
+
+    {% for folder in user.folder_set.all %}
+        {% if report in folder.reports.all %}
+            <div class="well">
+                <a class="btn btn-default" href="{% url 'master:index' %}">Back to List of Reports</a>
+                <a class="btn btn-default" href="{% url 'reports:reports' %}">New Report</a>
+                <a class="btn btn-danger" href="{% url "reports:delete_report" report.id %}">Delete</a>
+            </div>
+
+            <div class="page-header">
+                <h1>{{ report.title }}
+                    <small>Created by {{ report.creator }} <span
+                            class="label label-default">{{ report.create_date }}</span></small>
+                </h1>
+            </div>
+            <h4>Public: {{ report.public }}</h4> <Br>
+            <h4>Description:</h4> {{ report.description }}
+
+            <br> <br>
+            <div class="panel panel-default">
+                <div class="panel-heading">Attachments</div>
+                <ul class="list-attachments">
+                    <table class="table">
+                        <tr>
+                            <th>File Name</th>
+                            <th>Encrypted</th>
+                            <th>Upload Date</th>
+                            <th>Actions</th>
+                        </tr>
+                        {% for attachment in report.attachment_set.all %}
+                            <tr>
+                                <td>{{ attachment.name }}</td>
+                                <td>{{ attachment.encrypted }}</td>
+                                <td>{{ attachment.upload_date }}</td>
+                                <td><a href="{% url 'reports:delete_attachment' attachment.id %}">Delete</a></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </ul>
+            </div>
+
+            <h3>Add New Attachment</h3>
+            <form class="form-inline" method="post" enctype="multipart/form-data"
+                  action="{% url 'reports:attachments' report.id %}">
+                {% csrf_token %}
+
+                {% for field in attachment_form.visible_fields %}
+                    <div class="form-group">
+                        {{ field.errors }}
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-default">Upload Attachment</button>
+            </form>
+
+            {% if user.username == report.get_creator %}
+                <br> <br>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Contributors</div>
+                    <ul class="list-contributors">
+                        {% for contributor in reports.contributors %}
+                            <li class="list-contributor-item">{{ forloop.counter }}:{{ contributor.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <h3>Add other contributors to the report</h3>
+                <form class="form-inline" method="post" action="{% url 'reports:contributors' %}">
+                    <div class="form-contributor">
+                        {% csrf_token %}
+                        <input type="text" name="contributor_name" class="form-control" placeholder="Username to add">
+                    </div>
+                    <button type="submit" class="btn btn-default">Add Contributor</button>
+                </form>
+            {% endif %}
+
+        {% endif %}
+    {% endfor %}
+
+{% endblock %}
