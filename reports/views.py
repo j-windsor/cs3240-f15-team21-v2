@@ -319,6 +319,7 @@ def api_public_reports(request):
         serializer = ReportSerializer(reports, many=True)
         return Response(serializer.data)
 
+@authentication_classes((SessionAuthentication, BasicAuthentication))
 def api_download_attachment(request, attachment_id):
     thefile = Attachment.objects.get(id=attachment_id)
     if not thefile.has_access(request.user):

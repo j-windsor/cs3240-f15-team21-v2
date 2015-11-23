@@ -27,6 +27,9 @@ class Login(QDialog):
         global authentication
         authentication = HTTPBasicAuth(self.textName.text(), self.textPass.text())
         r = requests.get('https://guarded-mesa-1337.herokuapp.com/reports/api_available_reports', auth=authentication)
+        print(r.cookies)
+        #self.token = r.cookies['sessionid']
+        #authentication = {'sessionid': token}
         folders = r.json()
         if 'detail' in folders:
             errmsg = folders['detail']
@@ -139,6 +142,7 @@ class Window(QWidget):
         global authentication
         downloadurl = 'https://guarded-mesa-1337.herokuapp.com/reports/'+self.treeView.currentItem().text(4)+'/download_attachment'
         print(downloadurl)
+        print(authentication)
         r = requests.get(downloadurl, auth=authentication)
         if r.text == "denied":
             QMessageBox.warning(self, 'Error', "You do not have access to this file")
