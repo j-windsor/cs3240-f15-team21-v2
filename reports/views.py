@@ -9,7 +9,9 @@ from django.db.models import Q
 from django.template import RequestContext
 from .models import Report, Folder, Attachment
 from django.contrib.auth.models import Group, User
-
+from Crypto.Cipher import DES
+from Crypto.Hash import SHA256
+from django.core.mail import send_mail
 
 @login_required
 def reports(request):
@@ -286,6 +288,8 @@ def encrypt_attachment(request):
                 messages.success('email with key sent to ' + 'report.creator.email')
 
     return HttpResponseRedirect('/')
+
+
 
 ############################################## API VIEWS ARE BELOW ##
 from django.views.decorators.csrf import csrf_exempt
