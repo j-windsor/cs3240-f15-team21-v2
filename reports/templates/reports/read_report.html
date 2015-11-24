@@ -2,12 +2,16 @@
 {% block body_block %}
 
     {% for folder in user.folder_set.all %}
-        {% if report not in folder.reports.all or request.user.is_superuser %}
+        {% if report not in folder.reports.all %}
             {% if forloop.first %}
                 <h1><p class="text-danger">This is not your report.</p></h1>
+                {% if request.user.is_superuser %}
+                    <h1><p class="text-success">You can see this report because you're a site manager.</p></h1>
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endfor %}
+
 
 
     {% for folder in user.folder_set.all %}
