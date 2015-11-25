@@ -12,8 +12,6 @@ class Report(models.Model):
     #encrypted = models.BooleanField(default=False)
     def get_creator(self):
         return str(self.creator)
-    def is_public(self):
-        return self.public
 
 class Folder(models.Model):
     label = models.CharField(max_length=30)
