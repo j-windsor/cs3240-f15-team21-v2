@@ -139,6 +139,7 @@ def move(request):
         if Folder.objects.get(id = request.POST['move_from']):
             start = Folder.objects.get(id=request.POST['move_from'])
             end = Folder.objects.get(id=request.POST['move_to'])
+
             if start == end :
                 messages.warning(request, "You cannot move reports to their current folder!")
                 return HttpResponseRedirect('/')
