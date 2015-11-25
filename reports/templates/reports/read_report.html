@@ -4,9 +4,12 @@
     {% for folder in user.folder_set.all %}
         {% if report not in folder.reports.all %}
             {% if forloop.first %}
-                <h1><p class="text-danger">This is not your report.</p></h1>
-                {% if request.user.is_superuser %}
-                    <h1><p class="text-success">You can see this report because you're a site manager.</p></h1>
+                <h4><p class="text-danger">This is not your report.</p></h4>
+                {% if request.user.is_superuser and user.username != report.get_creator %}
+                    <h4><p class="text-success">You can see this report because you're a site manager.</p></h4>
+                {% endif %}
+                {% if report.is_public and user.username != report.get_creator %}
+                    <h4><p class="text-success">You can see this report because it's public.</p></h4>
                 {% endif %}
             {% endif %}
         {% endif %}
@@ -15,7 +18,7 @@
 
 
     {% for folder in user.folder_set.all %}
-        {% if report in folder.reports.all or request.user.is_superuser %}
+        {% if report in folder.reports.all or request.user.is_superuser or report.is_public %}
             {% if forloop.first %}
                 <div class="well">
                     <a class="btn btn-default" href="{% url 'master:index' %}">Back to List of Reports</a>
