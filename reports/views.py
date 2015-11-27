@@ -10,7 +10,9 @@ from django.template import RequestContext
 from .models import Report, Folder, Attachment
 from django.contrib.auth.models import Group, User
 from Crypto.Hash import MD5
-
+from Crypto.Cipher import DES
+from Crypto.Hash import SHA256
+from django.core.mail import send_mail
 
 @login_required
 def reports(request):
@@ -150,6 +152,7 @@ def move(request):
         if Folder.objects.get(id = request.POST['move_from']):
             start = Folder.objects.get(id=request.POST['move_from'])
             end = Folder.objects.get(id=request.POST['move_to'])
+
             if start == end :
                 messages.warning(request, "You cannot move reports to their current folder!")
                 return HttpResponseRedirect('/')
@@ -300,6 +303,8 @@ def encrypt_attachment(request):
                 messages.success('email with key sent to ' + 'report.creator.email')
 
     return HttpResponseRedirect('/')
+
+
 
 ############################################## API VIEWS ARE BELOW ##
 from django.views.decorators.csrf import csrf_exempt
