@@ -1,6 +1,8 @@
 import os
 from Crypto.Cipher import DES
 from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+from Crypto import Random
 from django.utils import timezone
 from django.shortcuts import render
 from django.shortcuts import render
@@ -58,13 +60,13 @@ def new(request):
                 return render(request, 'messages/new.html', {'message_form': f})
             if f.cleaned_data['encrypted']:
                 message.encrypted = True
-                thehash = SHA256.new(os.urandom(4))
-                hashstring = thehash.digest()[0:8]
-                message.key = str(hashstring)
-                des = DES.new(hashstring, DES.MODE_ECB)
-                text = str.encode(str(f.cleaned_data['content']))
-                while len(text) % 8 != 0:
-                    text += b'\0'
+                #thehash = SHA256.new(os.urandom(4))
+                #hashstring = thehash.digest()[0:8]
+                #message.key = str(hashstring)
+                #des = DES.new(hashstring, DES.MODE_ECB)
+                #text = str.encode(str(f.cleaned_data['content']))
+                #while len(text) % 8 != 0:
+                #    text += b'\0'
                 message.content = str(des.encrypt(text))
                 send_mail('[SecureShare] New Encrypted Message Key',
                  'You have a new message from '+message.sender.username+' with subject \"'+message.subject+'\". The DES key for this message is '+message.key+'.',

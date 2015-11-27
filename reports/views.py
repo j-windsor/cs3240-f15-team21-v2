@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.template import RequestContext
 from .models import Report, Folder, Attachment
 from django.contrib.auth.models import Group, User
+from Crypto.Hash import MD5
 
 
 @login_required
@@ -76,6 +77,18 @@ def attachments(request, report_id):
             attachment.report = report
             # NOW we can save
             attachment.save();
+
+            h = MD5.new()
+            chunk_size = 8192
+            with open(attachment.upload.path, 'rb') as f:
+                while True:
+                    chunk = f.read(chunk_size)
+                    if len(chunk) == 0:
+                        break
+                    h.update(chunk)
+            attachment.key = h.hexdigest()
+            attachment.save()
+
             messages.success(request, 'Attachment added!')
             return render(request, 'reports/read_report.html', {'report': report, "attachment_form": AttachmentForm()})
         else:
@@ -182,6 +195,7 @@ def read_report(request, report_id):
 def delete_attachment(request, attachment_id):
     try:
         attachment = Attachment.objects.get(id=attachment_id)
+        os.remove(attachment.upload.path)
         report = attachment.report
         attachment.delete()
         messages.success(request, "Attachment Deleted")
@@ -292,7 +306,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from .serializers import FolderSerializer, ReportSerializer
+from .serializers import FolderSerializer, ReportSerializer, AttachmentInfoSerializer
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -325,7 +339,22 @@ def api_download_attachment(request, attachment_id):
     if not thefile.has_access(request.user):
         return HttpResponse("denied")
     wrapper = FileWrapper(open(thefile.upload.path, 'rb'))
-    thetype = mimetypes.guess_type(thefile.filename())[0] + "; charset=binary"
+    thetype = ""
+    try:
+        thetype = mimetypes.guess_type(thefile.filename())[0] + "; charset=binary"
+    except:
+        thetype = "application/bin; charset=binary"
     response = HttpResponse(wrapper, content_type=thetype)
     response['Content-Disposition'] = "attachment; filename=file"
     return response
+
+@api_view(['POST'])
+@authentication_classes((SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def api_add_report(request):
+    if request.method == 'POST':
+        serializer = AttachmentInfoSerializer(data=request.data)
+        if serializer.is_valid():
+            a = serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)

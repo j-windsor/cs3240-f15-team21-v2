@@ -28,7 +28,7 @@ class Attachment (models.Model):
     upload = models.FileField(upload_to=get_upload_file_name)
     key = models.CharField(max_length=100)
     encrypted = models.BooleanField(default=False)
-    upload_date = models.DateTimeField('date uploaded')
+    upload_date = models.DateTimeField('date uploaded', auto_now_add=True)
     report = models.ForeignKey(Report)
     def __str__(self):
         return self.name
