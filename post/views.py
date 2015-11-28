@@ -34,11 +34,16 @@ def read(request, message_id):
     if request.method == 'POST':
         f = KeyForm(request.POST, request.FILES)
         if f.is_valid():
-            key = RSA.importKey(f.cleaned_data['pem_file'].read(), request.user.pem_key)
-            content = key.decrypt(message.content)
-            return render(request, 'messages/read.html', {'message': message, 'content': content})
+            try:
+                key = RSA.importKey(f.cleaned_data['pem_file'].read(), request.user.pem_key)
+                content = key.decrypt(message.content)
+                return render(request, 'messages/read.html', {'message': message, 'content': content})
+            except:
+
+                messages.warning(request, 'Decryption did not occur: PEM file invalid')
+                return HttpResponseRedirect('/messages/inbox')
         else:
-            messages.warning(request, 'Decryption did not occur.')
+            messages.warning(request, 'Decryption did not occur: File upload error.')
             return render(request, 'messages/inbox.html', {'key_form': f})
     if message.recipient.id == request.user.id:
         return render(request, 'messages/read.html', {'message': message, 'content': message.content.decode('utf-8')})
