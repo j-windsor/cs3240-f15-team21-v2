@@ -10,3 +10,6 @@ class MessageForm(forms.Form):
     #class Meta:
     #    model = Message
     #    fields = ('recipient', 'subject', 'content', 'encrypted')
+
+class KeyForm(forms.Form):
+    pem_file = forms.FileField()

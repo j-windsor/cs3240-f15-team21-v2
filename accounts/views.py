@@ -7,6 +7,14 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group, User
 from reports.models import Folder, Report
+from Crypto import Random
+import random
+import string
+from Crypto.PublicKey import RSA
+from django.core.mail import EmailMessage
+
+
+
 # Create your views here.
 
 def register(request):
@@ -39,6 +47,17 @@ def register(request):
             shared_folder.owner = user
             shared_folder.save()
             user.folder_set.add(shared_folder)
+
+            # Keys for post app
+            random_generator = Random.new().read
+            key = RSA.generate(1024, random_generator)
+            user.pem_key = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
+            user.public_key = key.publickey().exportKey('PEM', "password")
+            email = EmailMessage('[SecureShare] Welcome to SecureShare!', 'Welcome to SecureShare '+user.first_name+'! Please save the attached PEM file in a safe place. You will need this to unencrypt any encrypted messages you receive.',
+            'secureshare21@yahoo.com',
+            [user.email])
+            email.attach('privatekey.pem', key.exportKey('PEM', user.pem_key), 'application/x-pem-file')
+            email.send()
 
             user.save()
 
@@ -190,4 +209,3 @@ def makeSiteManager(request, user_id):
         messages.warning(request, member.username + "not made into a site manager")
 
     return render(request, 'accounts/user_view.html', {'member':member})
-
