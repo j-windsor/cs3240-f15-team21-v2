@@ -163,7 +163,7 @@ def groups(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def sitemanager(request):
-    return render(request, 'accounts/sitemanager.html', {'all_users':User.objects.all()})
+    return render(request, 'accounts/sitemanager.html', {'all_users':User.objects.all(), 'all_groups': Group.objects.all()})
 
 @user_passes_test(lambda u: u.is_superuser)
 def user_view(request, user_id):
@@ -204,8 +204,48 @@ def makeSiteManager(request, user_id):
     try:
         member.is_superuser=True
         member.save()
-        messages.success(request, member.username + "made into a site manager")
+        messages.success(request, member.username + " made into a site manager")
     except:
-        messages.warning(request, member.username + "not made into a site manager")
+        messages.warning(request, member.username + " not made into a site manager")
 
     return render(request, 'accounts/user_view.html', {'member':member})
+
+@user_passes_test(lambda u: u.is_superuser)
+def unmakeSiteManager(request, user_id):
+    member = User.objects.get(id=user_id)
+    try:
+        member.is_superuser=False
+        member.save()
+        messages.success(request, member.username + " is no longer a site manager")
+    except:
+        messages.warning(request, member.username + " is still a site manager")
+
+    return render(request, 'accounts/user_view.html', {'member':member})
+
+@user_passes_test(lambda u: u.is_superuser)
+def groupsSM(request):
+    if request.method == 'POST':
+        if request.POST.get('user_name'):
+            user_name = request.POST.get('user_name')
+            group_name = request.POST.get('group_name')
+            try:
+                user = User.objects.get(username=user_name)
+                group = Group.objects.get(name=group_name)
+                user.groups.add(group)
+                user.save()
+                full_name = user.first_name + " " + user.last_name
+                messages.success(request, full_name + " added to group!")
+            except:
+                messages.warning(request, 'User not added to group: Username not Found!')
+        else:
+            group_name = request.POST.get('group_name')
+            try:
+                newgroup = Group()
+                newgroup.name = group_name
+                newgroup.save()
+                messages.success(request, 'Group Created.')
+            except:
+                messages.warning(request, 'Group Creation Failed. Group Already Exists.')
+
+        return HttpResponseRedirect('/accounts/sitemanager')
+    return render(request, 'accounts/sitemanager.html', {})
