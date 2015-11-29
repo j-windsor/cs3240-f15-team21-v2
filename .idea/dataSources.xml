@@ -5,15 +5,8 @@
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\Student\Documents\GitHub\cs3240-f15-team21-v2\db.sqlite3</jdbc-url>
-      <libraries>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/xerial-sqlite-license.txt</url>
-        </library>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/sqlite-jdbc-3.7.6.3-20110609.081603-3.jar</url>
-        </library>
-      </libraries>
+      <jdbc-url>jdbc:sqlite:C:\Users\Fran\PycharmProjects\cs3240-f15-team21-v2\db.sqlite3</jdbc-url>
+      <libraries />
     </data-source>
   </component>
 </project>

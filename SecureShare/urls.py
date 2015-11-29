@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^$', include('master.urls', namespace="master")),
     url(r'^messages/', include('post.urls', namespace="messages")),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^tinymce/', include('tinymce.urls')),
 ]
