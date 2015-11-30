@@ -22,10 +22,15 @@
         </div>
         <div class="col-md-6">
                 <div class="well">
-                    <form class="form-inline" method="get" action="/reports/search_reports/">
+                    <form class="form-inline" method="get" action="/reports/search_reports">
                         <label for="id_q">Search:</label>
-                        <input type="text" name="q" id="id_q"/>
-                        <input type="submit" value="Submit"/>
+                        <input type="radio" name="report" id="id_report" checked="checked"/>For Reports
+                        <input type="radio" name="folder" id="id_folder"/>For Folders
+                        <input type="radio" name="creator" id="id_creator"/>For Creators
+                        <input type="radio" name="attachment" id="id_attach"/>For Attachments
+                        <br>
+                        <input type="text" name="q" id="id_q" size="45"/>
+                        <input type="submit" class="btn btn-default" class="form-control" value="Submit"/>
                     </form>
                 </div>
         </div>
@@ -46,16 +51,23 @@
     <table class="table">
       <tr>
         <th>Name</th>
+          <th>Creator</th>
         <th>Public</th>
         <th>Date Created</th>
+          <th>Attachments</th>
         <th>Actions</th>
         <th>Move to...</th>
       </tr>
       {% for report in folder.reports.all %}
       <tr>
         <td><a href="{% url 'reports:read_report' report.id %}">{{ report.title }}</a></td>
+        <td> {{ report.creator }} </td>
         <td>{{ report.public }}</td>
         <td>{{ report.create_date }}</td>
+      <td>
+          <a id="popover" class="btn btn-default" data-container="body" data-toggle="popover"
+                  data-placement="right" data-content="{% for attachment in report.attachment_set.all %}{{ attachment.name }}, {% endfor %}">Attachments</a>
+      </td>
         <td> <a href="{% url "reports:edit_report" report.id %}">Edit</a> &nbsp; &nbsp;
           <a href="{% url "reports:delete_report" report.id %}">Delete</a></td>
         <td>
@@ -89,3 +101,12 @@
 <p>Many small groups in the world need a means to collect, share, and distribute information securely, without risking it falling into the wrong hands on their own computer or servers, and without it being lost due to other reasons (theft, viruses, etc). Examples of such groups include grassroots organizations, new businesses, political groups, freedom fighters, human rights organizations, journalists, etc.</p>
 {% endif %}
 {% endblock %}
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+          $('[data-toggle="popover"]').popover()
+        $('#popover').tooltip(options)
+        $('#popover').popover()
+    });
+</script>

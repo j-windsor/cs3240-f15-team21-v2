@@ -198,11 +198,27 @@ def search(request):
     query_string = ''
     found_entries = None
     if ('q' in request.GET) and request.GET['q'].strip():
-        query_string = request.GET['q']
-
-        entry_query = get_query(query_string, ['title', 'description',])
-
+        if 'id_creator' is True:
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['creator'])
+        elif 'id_attach' is True :
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['name'])
+        elif 'id_report' is True :
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['title'])
+        elif 'id_folder' is True:
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['label'])
+        elif'id_folder' and 'id_report' and 'id_attach' and 'id_creator' is not True:
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['title', 'description',])
         found_entries = Report.objects.filter(entry_query)
+
+    if ('and' in 'q'):
+        print("hello!")
+    if('or' in 'q'):
+        print('hello!')
 
     return render_to_response('reports/search_results.html',
                           { 'query_string': query_string, 'found_entries': found_entries },
