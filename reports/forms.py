@@ -11,11 +11,10 @@ class ReportForm(forms.ModelForm):
 
 class AttachmentForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
-    encrypted = forms.BooleanField(required=False)
     upload = forms.FileField()
     class Meta:
         model = Attachment
-        fields = ('name', 'encrypted', 'upload')
+        fields = ('name', 'upload')
 
 class ContributorForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))

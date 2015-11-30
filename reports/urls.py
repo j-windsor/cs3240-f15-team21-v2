@@ -19,4 +19,6 @@ urlpatterns = [
     url(r'^api_available_reports/$', views.api_available_reports, name='api_available_reports'),
     url(r'^api_public_reports/$', views.api_public_reports, name='api_public_reports'),
     url(r'^(?P<attachment_id>[0-9]+)/download_attachment/$', views.api_download_attachment, name='api_download_attachment'),
+    url(r'^api_add_report/$', views.api_add_report, name='api_add_report'),
+
 ]

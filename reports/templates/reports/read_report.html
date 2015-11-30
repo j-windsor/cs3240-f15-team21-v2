@@ -48,6 +48,7 @@
                         <tr>
                             <th>File Name</th>
                             <th>Encrypted</th>
+                            <th>Checksum</th>
                             <th>Upload Date</th>
                             <th>Actions</th>
                         </tr>
@@ -55,16 +56,16 @@
                             <tr>
                                 <td>{{ attachment.name }}</td>
                                 <td>{{ attachment.encrypted }}</td>
+                                <td>{{ attachment.key }}</td>
                                 <td>{{ attachment.upload_date }}</td>
-                                <td><a href="{% url 'reports:delete_attachment' attachment.id %}">Delete</a>
-                                </td>
+                                <td><a href="{% url 'reports:delete_attachment' attachment.id %}">Delete</a> {% if not attachment.encrypted %}| <a href="{% url 'reports:api_download_attachment' attachment.id %}">Download</a>{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </table>
                 </ul>
             </div>
 
-            <h3>Add New Attachment</h3>
+            <h3>Add New Unencrypted Attachment</h3>
             <form class="form-inline" method="post" enctype="multipart/form-data"
                   action="{% url 'reports:attachments' report.id %}">
                 {% csrf_token %}

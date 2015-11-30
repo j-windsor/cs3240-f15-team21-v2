@@ -9,6 +9,6 @@ class Message(models.Model):
     unread = models.BooleanField(default=True)
     encrypted = models.BooleanField(default=False)
     subject = models.CharField(max_length=30)
-    content = models.CharField(max_length=500)
+    content = models.BinaryField()
     key = models.CharField(max_length=80)
     send_date = models.DateField()

@@ -20,7 +20,11 @@
       {% for message in user.recipient.all %}
 
       <tr>
-        <td><a href="{% url 'messages:read' message.id %}">{{ message.subject}}</a> {% if message.unread %}<span class="label label-info">UNREAD</span>{% endif %}</td>
+        <td>
+          {% if message.encrypted %} <a data-toggle="modal" data-target="#form{{ message.id }}">{{ message.subject}}</a>
+          {% else %}<a href="{% url 'messages:read' message.id %}">{{ message.subject}}</a>{% endif %}
+          {% if message.unread %}<span class="label label-info">UNREAD</span>{% endif %}
+        </td>
         <td>{{ message.sender }}</td>
         <td>{{ message.send_date }}</td>
         <td>{{ message.encrypted }}</td>
@@ -29,5 +33,37 @@
       {% endfor %}
     </table>
 </div>
+
+{% for message in user.recipient.all %}
+{% if message.encrypted %}
+<div class="modal fade" id="form{{ message.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">"{{ message.subject }}" is an encrypted message</h4>
+      </div>
+      <form method="post" enctype="multipart/form-data" action="/messages/{{ message.id }}/read/">
+      <div class="modal-body">
+      {% csrf_token %}
+        <p>Please upload your encrypted PEM file. It was emailed to you when you created your account. All information is transferred over SSL.</p>
+        {% for field in key_form.visible_fields %}
+        <div class="form-group">
+          {{ field.errors }}
+          <label>{{ field.label }}</label>
+          {{ field }}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">View Message</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endfor %}
 
 {% endblock %}

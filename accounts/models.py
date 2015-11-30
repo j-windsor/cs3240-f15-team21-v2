@@ -9,3 +9,8 @@ def get_unread(self):
 
 User.add_to_class('get_unread', get_unread)
 
+public_key = models.CharField(max_length=1000)
+public_key.contribute_to_class(User, 'public_key')
+
+pem_key = models.CharField(max_length=1000)
+pem_key.contribute_to_class(User, 'pem_key')

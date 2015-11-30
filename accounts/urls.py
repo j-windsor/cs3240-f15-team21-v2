@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^(?P<user_id>[0-9]+)/deactivate/$', views.deactivate, name='deactivate'),
     url(r'^(?P<user_id>[0-9]+)/activate/$', views.activate, name='activate'),
     url(r'^(?P<user_id>[0-9]+)/makeSiteManager/$', views.makeSiteManager, name='makeSiteManager'),
-
+    url(r'^(?P<user_id>[0-9]+)/unmakeSiteManager/$', views.unmakeSiteManager, name='unmakeSiteManager'),
+    url(r'^groups/sitemanager/$', views.groupsSM, name='groupsSM'),
 ]

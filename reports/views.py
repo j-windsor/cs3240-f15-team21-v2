@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.template import RequestContext
 from .models import Report, Folder, Attachment
 from django.contrib.auth.models import Group, User
+from Crypto.Hash import MD5
 from Crypto.Cipher import DES
 from Crypto.Hash import SHA256
 from django.core.mail import send_mail
@@ -78,6 +79,18 @@ def attachments(request, report_id):
             attachment.report = report
             # NOW we can save
             attachment.save();
+
+            h = MD5.new()
+            chunk_size = 8192
+            with open(attachment.upload.path, 'rb') as f:
+                while True:
+                    chunk = f.read(chunk_size)
+                    if len(chunk) == 0:
+                        break
+                    h.update(chunk)
+            attachment.key = h.hexdigest()
+            attachment.save()
+
             messages.success(request, 'Attachment added!')
             return render(request, 'reports/read_report.html', {'report': report, "attachment_form": AttachmentForm()})
         else:
@@ -86,13 +99,19 @@ def attachments(request, report_id):
 
 @login_required
 def delete_report(request, report_id):
-    if Report.objects.filter(creator=request.user):
+    if Report.objects.filter(creator=request.user) or request.user.is_superuser:
         Report.objects.get(id=report_id).delete()
         messages.success(request, 'Report destroyed')
-        return HttpResponseRedirect('/')
+        if request.user.is_superuser:
+            return HttpResponseRedirect('/accounts/sitemanager/')
+        else:
+            return HttpResponseRedirect('/')
     else:
         messages.warning(request, "Your report was not deleted.")
-        return HttpResponseRedirect('/')
+        if request.user.is_superuser:
+            return HttpResponseRedirect('/accounts/sitemanager/')
+        else:
+            return HttpResponseRedirect('/')
 
 @login_required
 def edit_report(request, report_id):
@@ -185,6 +204,7 @@ def read_report(request, report_id):
 def delete_attachment(request, attachment_id):
     try:
         attachment = Attachment.objects.get(id=attachment_id)
+        os.remove(attachment.upload.path)
         report = attachment.report
         attachment.delete()
         messages.success(request, "Attachment Deleted")
@@ -197,7 +217,9 @@ def delete_attachment(request, attachment_id):
 def search(request):
     query_string = ''
     found_entries = None
+    found_entries_two = None
     if ('q' in request.GET) and request.GET['q'].strip():
+<<<<<<< HEAD
         if 'id_creator' is True:
             query_string = request.GET['q']
             entry_query = get_query(query_string,  ['creator'])
@@ -214,6 +236,25 @@ def search(request):
             query_string = request.GET['q']
             entry_query = get_query(query_string,  ['title', 'description',])
         found_entries = Report.objects.filter(entry_query)
+=======
+        query_string = request.GET['q']
+        if "AND" in query_string:
+            query_string = request.GET['q'].replace('AND','')
+
+        entry_query = get_query(query_string, ['title', 'description', ])
+        all_entries = Report.objects.filter(entry_query)
+
+        if "OR" in query_string:
+            query_string = request.GET['q'].split('OR')
+            query_string_one = query_string[0]
+            query_string_two = query_string[1]
+            entry_query = get_query(query_string_one, ['title', 'description', ])
+            entry_query_two = get_query(query_string_two, ['title', 'description', ])
+            found_entries = Report.objects.filter(entry_query)
+            found_entries_two = Report.objects.filter(entry_query_two)
+            all_entries = found_entries | found_entries_two
+
+>>>>>>> fd4e8704f732b5f98986af8aacee4a4c78b8b46a
 
     if ('and' in 'q'):
         print("hello!")
@@ -221,8 +262,8 @@ def search(request):
         print('hello!')
 
     return render_to_response('reports/search_results.html',
-                          { 'query_string': query_string, 'found_entries': found_entries },
-                          context_instance=RequestContext(request))
+                              {'query_string': query_string, 'found_entries': all_entries},
+                              context_instance=RequestContext(request))
 
 def normalize_query(query_string,
     findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
@@ -313,7 +354,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from .serializers import FolderSerializer, ReportSerializer
+from .serializers import FolderSerializer, ReportSerializer, AttachmentInfoSerializer
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -346,7 +387,22 @@ def api_download_attachment(request, attachment_id):
     if not thefile.has_access(request.user):
         return HttpResponse("denied")
     wrapper = FileWrapper(open(thefile.upload.path, 'rb'))
-    thetype = mimetypes.guess_type(thefile.filename())[0] + "; charset=binary"
+    thetype = ""
+    try:
+        thetype = mimetypes.guess_type(thefile.filename())[0] + "; charset=binary"
+    except:
+        thetype = "application/bin; charset=binary"
     response = HttpResponse(wrapper, content_type=thetype)
     response['Content-Disposition'] = "attachment; filename=file"
     return response
+
+@api_view(['POST'])
+@authentication_classes((SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def api_add_report(request):
+    if request.method == 'POST':
+        serializer = AttachmentInfoSerializer(data=request.data)
+        if serializer.is_valid():
+            a = serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)

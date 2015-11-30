@@ -1,13 +1,13 @@
 import os
-from Crypto.Cipher import DES
-from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+from Crypto import Random
 from django.utils import timezone
 from django.shortcuts import render
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
-from .forms import MessageForm
+from .forms import MessageForm, KeyForm
 from django.contrib.auth.models import User
 from .models import Message
 from django.core.mail import send_mail
@@ -15,7 +15,7 @@ from django.core.mail import send_mail
 
 @login_required
 def inbox(request):
-    return render(request, 'messages/inbox.html')
+    return render(request, 'messages/inbox.html', {'key_form': KeyForm()})
 
 @login_required
 def delete(request, message_id):
@@ -29,10 +29,24 @@ def delete(request, message_id):
 @login_required
 def read(request, message_id):
     message = Message.objects.get(id=message_id)
+    message.unread = False
+    message.save()
+    if request.method == 'POST':
+        f = KeyForm(request.POST, request.FILES)
+        if f.is_valid():
+            try:
+                key = RSA.importKey(f.cleaned_data['pem_file'].read(), request.user.pem_key)
+                content = key.decrypt(message.content)
+                return render(request, 'messages/read.html', {'message': message, 'content': content})
+            except:
+
+                messages.warning(request, 'Decryption did not occur: PEM file invalid')
+                return HttpResponseRedirect('/messages/inbox')
+        else:
+            messages.warning(request, 'Decryption did not occur: File upload error.')
+            return render(request, 'messages/inbox.html', {'key_form': f})
     if message.recipient.id == request.user.id:
-        message.unread = False
-        message.save()
-        return render(request, 'messages/read.html', {'message': message})
+        return render(request, 'messages/read.html', {'message': message, 'content': message.content.decode('utf-8')})
     else:
         return HttpResponseRedirect('/messages/inbox')
 
@@ -50,7 +64,7 @@ def new(request):
             message = Message()
             message.sender = request.user
             message.subject = f.cleaned_data['subject']
-            message.content = f.cleaned_data['content']
+            message.content = f.cleaned_data['content'].encode()
             try:
                 message.recipient = User.objects.get(username=f.cleaned_data['recipient'])
             except:
@@ -58,18 +72,9 @@ def new(request):
                 return render(request, 'messages/new.html', {'message_form': f})
             if f.cleaned_data['encrypted']:
                 message.encrypted = True
-                thehash = SHA256.new(os.urandom(4))
-                hashstring = thehash.digest()[0:8]
-                message.key = str(hashstring)
-                des = DES.new(hashstring, DES.MODE_ECB)
-                text = str.encode(str(f.cleaned_data['content']))
-                while len(text) % 8 != 0:
-                    text += b'\0'
-                message.content = str(des.encrypt(text))
-                send_mail('[SecureShare] New Encrypted Message Key',
-                 'You have a new message from '+message.sender.username+' with subject \"'+message.subject+'\". The DES key for this message is '+message.key+'.',
-                 'secureshare21@yahoo.com', [message.recipient.email], fail_silently=False)
-                ####### TODO: ADD ENCRYPTION STUFF
+                key = RSA.importKey(message.recipient.public_key, "password")
+                message.content = key.publickey().encrypt(message.content, 32)[0]
+
             message.send_date = timezone.now()
             # NOW we can save
             message.save();

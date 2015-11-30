@@ -44,7 +44,25 @@ INSTALLED_APPS = (
     'reports',
     'post',
     'rest_framework',
+    'tinymce',
 )
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (
+os.path.join(BASE_DIR, 'static'),
+)
+TINYMCE_JS_URL = os.path.join(MEDIA_ROOT, "js/tiny_mce/tiny_mce.js")
+TINYMCE_JS_ROOT = os.path.join(MEDIA_ROOT, "js/tiny_mce")
+TINYMCE_SPELLCHECKER = True
+TINYMCE_COMPRESSOR = True
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'simple',
+    'relative_urls': False,
+    'plugins': 'media',
+    'theme_advanced_buttons1': 'bold,italic,underline,bullist,numlist,|,media,link,unlink,image',
+    'theme_advanced_resizing': True,
+    'theme_advanced_path': False,
+}
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.yahoo.com'
