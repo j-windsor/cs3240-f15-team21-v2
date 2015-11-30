@@ -99,13 +99,19 @@ def attachments(request, report_id):
 
 @login_required
 def delete_report(request, report_id):
-    if Report.objects.filter(creator=request.user):
+    if Report.objects.filter(creator=request.user) or request.user.is_superuser:
         Report.objects.get(id=report_id).delete()
         messages.success(request, 'Report destroyed')
-        return HttpResponseRedirect('/')
+        if request.user.is_superuser:
+            return HttpResponseRedirect('/accounts/sitemanager/')
+        else:
+            return HttpResponseRedirect('/')
     else:
         messages.warning(request, "Your report was not deleted.")
-        return HttpResponseRedirect('/')
+        if request.user.is_superuser:
+            return HttpResponseRedirect('/accounts/sitemanager/')
+        else:
+            return HttpResponseRedirect('/')
 
 @login_required
 def edit_report(request, report_id):
