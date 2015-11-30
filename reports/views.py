@@ -211,16 +211,29 @@ def delete_attachment(request, attachment_id):
 def search(request):
     query_string = ''
     found_entries = None
+    found_entries_two = None
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET['q']
+        if "AND" in query_string:
+            query_string = request.GET['q'].replace('AND','')
 
-        entry_query = get_query(query_string, ['title', 'description',])
+        entry_query = get_query(query_string, ['title', 'description', ])
+        all_entries = Report.objects.filter(entry_query)
 
-        found_entries = Report.objects.filter(entry_query)
+        if "OR" in query_string:
+            query_string = request.GET['q'].split('OR')
+            query_string_one = query_string[0]
+            query_string_two = query_string[1]
+            entry_query = get_query(query_string_one, ['title', 'description', ])
+            entry_query_two = get_query(query_string_two, ['title', 'description', ])
+            found_entries = Report.objects.filter(entry_query)
+            found_entries_two = Report.objects.filter(entry_query_two)
+            all_entries = found_entries | found_entries_two
+
 
     return render_to_response('reports/search_results.html',
-                          { 'query_string': query_string, 'found_entries': found_entries },
-                          context_instance=RequestContext(request))
+                              {'query_string': query_string, 'found_entries': all_entries},
+                              context_instance=RequestContext(request))
 
 def normalize_query(query_string,
     findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
