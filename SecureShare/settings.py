@@ -66,7 +66,7 @@ TINYMCE_DEFAULT_CONFIG = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.yahoo.com'
-EMAIL_HOST_USER = 'secureshare21@yahoo.com'
+EMAIL_HOST_USER = 'secureshare21uva@yahoo.com'
 EMAIL_HOST_PASSWORD = 'mygleeclubisafireman'
 EMAIL_PORT = 465
 #EMAIL_USE_TLS = True
@@ -112,7 +112,7 @@ WSGI_APPLICATION = 'SecureShare.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-"""
+
 import dj_database_url
 DATABASES = {
     'default': dj_database_url.config()
@@ -124,7 +124,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+"""
 # Enable Persistent Connections
 DATABASES['default']['CONN_MAX_AGE'] = 500
 

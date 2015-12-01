@@ -219,7 +219,6 @@ def search(request):
     found_entries = None
     found_entries_two = None
     if ('q' in request.GET) and request.GET['q'].strip():
-<<<<<<< HEAD
         if 'id_creator' is True:
             query_string = request.GET['q']
             entry_query = get_query(query_string,  ['creator'])
@@ -236,7 +235,6 @@ def search(request):
             query_string = request.GET['q']
             entry_query = get_query(query_string,  ['title', 'description',])
         found_entries = Report.objects.filter(entry_query)
-=======
         query_string = request.GET['q']
         if "AND" in query_string:
             query_string = request.GET['q'].replace('AND','')
@@ -253,8 +251,6 @@ def search(request):
             found_entries = Report.objects.filter(entry_query)
             found_entries_two = Report.objects.filter(entry_query_two)
             all_entries = found_entries | found_entries_two
-
->>>>>>> fd4e8704f732b5f98986af8aacee4a4c78b8b46a
 
     if ('and' in 'q'):
         print("hello!")
