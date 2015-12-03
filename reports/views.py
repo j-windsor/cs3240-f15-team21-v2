@@ -211,7 +211,7 @@ def delete_attachment(request, attachment_id):
         return render(request, 'reports/read_report.html', {'report': report, "attachment_form": AttachmentForm()})
     except:
         messages.warning(request, "ERROR: Attachment Not Deleted!")
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER','/'))
 
 @login_required
 def search(request):
@@ -309,7 +309,7 @@ def contributors(request, report_id):
 
         messages.success(request, "Added group members as contributors!")
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER','/'))
 
 @login_required
 def encrypt_attachment(request):
