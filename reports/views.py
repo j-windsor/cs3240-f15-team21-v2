@@ -380,6 +380,7 @@ def api_public_reports(request):
 @authentication_classes((SessionAuthentication, BasicAuthentication))
 def api_download_attachment(request, attachment_id):
     thefile = Attachment.objects.get(id=attachment_id)
+    file_extension = "."+thefile.upload.path.split(".")[1]
     if not thefile.has_access(request.user):
         return HttpResponse("denied")
     wrapper = FileWrapper(open(thefile.upload.path, 'rb'))
@@ -389,7 +390,7 @@ def api_download_attachment(request, attachment_id):
     except:
         thetype = "application/bin; charset=binary"
     response = HttpResponse(wrapper, content_type=thetype)
-    response['Content-Disposition'] = "attachment; filename=file"
+    response['Content-Disposition'] = "attachment; filename=download"+file_extension
     return response
 
 @api_view(['POST'])
