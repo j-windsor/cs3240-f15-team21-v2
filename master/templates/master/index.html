@@ -3,6 +3,11 @@
 {% if user.is_authenticated %}
 <h2>Hello {{ user.first_name }}. Welcome to SecureShare!</h2>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript">
+    document.write("\<script src='http://code.jquery.com/jquery-latest.min.js' type='text/javascript'>\<\/script>");
+</script>
+
     <div class="row">
         <div class="col-md-6">
             <div class="well">
@@ -20,22 +25,28 @@
                 </form>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12">
                 <div class="well">
                     <form class="form-inline" method="get" action="/reports/search_reports">
-                        <label for="id_q">Search For:</label>
-                        {% csrf_token %}
-                        <input type="radio" name="report" id="id_report" checked="checked"/>Reports
-                        <input type="radio" name="folder" id="id_folder"/>Folders
-                        <input type="radio" name="creator" id="id_creator"/>Creators
-                        <input type="radio" name="attachment" id="id_attach"/>Attachments
-                        <br>
-                        <input type="text" class="form-control" name="q" id="id_q" size="45"/>
+                        <input type="text" class="form-control" name="q" id="id_q" size="122" placeholder="Enter Search Keywords"/>
                         <input type="submit" class="btn btn-default" class="form-control" value="Search"/>
                     </form>
                 </div>
         </div>
     </div>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("input[type='button']").click(function(){
+        	var radioValue = $("input[name='search']:checked").val();
+            if(radioValue){
+                alert("You are a - " + radioValue);
+            }
+        });
+
+    });
+</script>
 
 
 {% for folder in user.folder_set.all %}
@@ -66,24 +77,31 @@
         <td>{{ report.public }}</td>
         <td>{{ report.create_date }}</td>
       <td>
-          <a id="popover" class="btn btn-default" data-container="body" data-toggle="popover"
-                  data-placement="right" data-content="{% for attachment in report.attachment_set.all %}{{ attachment.name }}, {% endfor %}">Attachments</a>
+        <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#attach{{report.id}}">Click for all Attachments</button>
+        <div id="attach{{report.id}}" class="collapse">
+            <ul>
+            {% for attachment in report.attachment_set.all %}<li>{{ attachment.name }}</li>{% endfor %}
+
+            </ul>
+            </div>
       </td>
         <td> <a href="{% url "reports:edit_report" report.id %}">Edit</a> &nbsp; &nbsp;
           <a href="{% url "reports:delete_report" report.id %}">Delete</a></td>
         <td>
-          <form id="folder_move_form" method="post" action="/reports/move/">
+          <form id="move{{report.id}}" method="post" action="/reports/move/">
           {% csrf_token %}
-            <select name="move_to" onChange = "$('#folder_move_form').submit()">
+            <select name="move_to" onChange = "$('#move{{report.id}}').submit()">
               <option value="" disabled="disabled" selected="selected">Please select a folder</option>
-              {% for listfold in user.folder_set.all %}
-              {% if listfold.label != "Shared With Me" %}
-                <option value="{{listfold.id}}"> {{ listfold.label }}</option>
+                {% for listfold in user.folder_set.all %}
+                {% if listfold.label != folder.label %}
+                    {% if listfold.label != "Shared With Me" %}
+                    <option value="{{listfold.id}}">{{ listfold.label }}</option>
               {% endif %}
+                {% endif %}
               {% endfor %}
-            </select>
-            <input type="hidden" name="move_from" value="{{folder.id }}">
+                <input type="hidden" name="move_from" value="{{folder.id }}">
             <input type="hidden" name="currep" value="{{report.id}}">
+            </select>
             </form>
         </td>
       </tr>
@@ -97,17 +115,16 @@
 <div class="jumbotron">
   <h1>Welcome to SecureShare</h1>
   <p>An Information System to Support Secure Information Sharing</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}" role="button">Register Now</a></p>
+  <p><a class="btn btn-primary btn-lg" hr   ef="{% url 'accounts:register' %}" role="button">Register Now</a></p>
 </div>
 <p>Many small groups in the world need a means to collect, share, and distribute information securely, without risking it falling into the wrong hands on their own computer or servers, and without it being lost due to other reasons (theft, viruses, etc). Examples of such groups include grassroots organizations, new businesses, political groups, freedom fighters, human rights organizations, journalists, etc.</p>
 {% endif %}
 {% endblock %}
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="/js/jquery-1.2.6.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="/js/jquery-ui-personalized-1.5.2.packed.js"></script>
+<script language="JavaScript" type="text/javascript" src="/js/sprinkle.js"></script>
 <script type="text/javascript">
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-          $('[data-toggle="popover"]').popover()
-        $('#popover').tooltip(options)
-        $('#popover').popover()
-    });
+    document.write("\<script src='http://code.jquery.com/jquery-latest.min.js' type='text/javascript'>\<\/script>");
 </script>
