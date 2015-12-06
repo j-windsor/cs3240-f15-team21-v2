@@ -13,10 +13,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Profile',
+            name='Security',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
-                ('public_key', models.CharField(max_length=100)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('pem_key', models.CharField(default='key', max_length=1000)),
+                ('public_key', models.CharField(default='key', max_length=1000)),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
         ),

@@ -34,19 +34,18 @@ def read(request, message_id):
     if request.method == 'POST':
         f = KeyForm(request.POST, request.FILES)
         if f.is_valid():
-            try:
-                key = RSA.importKey(f.cleaned_data['pem_file'].read(), request.user.pem_key)
-                content = key.decrypt(message.content)
-                return render(request, 'messages/read.html', {'message': message, 'content': content})
-            except:
-
-                messages.warning(request, 'Decryption did not occur: PEM file invalid')
-                return HttpResponseRedirect('/messages/inbox')
+            #try:
+            key = RSA.importKey(f.cleaned_data['pem_file'].read(), request.user.security.pem_key)
+            content = key.decrypt(message.content.tobytes())
+            return render(request, 'messages/read.html', {'message': message, 'content': content})
+            #except:
+            #    messages.warning(request, 'Decryption did not occur: PEM file invalid')
+            #    return HttpResponseRedirect('/messages/inbox')
         else:
             messages.warning(request, 'Decryption did not occur: File upload error.')
             return render(request, 'messages/inbox.html', {'key_form': f})
     if message.recipient.id == request.user.id:
-        return render(request, 'messages/read.html', {'message': message, 'content': message.content.decode('utf-8')})
+        return render(request, 'messages/read.html', {'message': message, 'content': message.content.tobytes().decode('utf-8')})
     else:
         return HttpResponseRedirect('/messages/inbox')
 
@@ -72,7 +71,7 @@ def new(request):
                 return render(request, 'messages/new.html', {'message_form': f})
             if f.cleaned_data['encrypted']:
                 message.encrypted = True
-                key = RSA.importKey(message.recipient.public_key, "password")
+                key = RSA.importKey(message.recipient.security.public_key, "password")
                 message.content = key.publickey().encrypt(message.content, 32)[0]
 
             message.send_date = timezone.now()

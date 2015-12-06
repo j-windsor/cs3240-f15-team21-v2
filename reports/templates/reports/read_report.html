@@ -24,8 +24,9 @@
 
             <div class="well">
                 <a class="btn btn-default" href="{% url 'master:index' %}">Back to List of Reports</a>
-                <a class="btn btn-default" href="{% url 'reports:reports' %}">New Report</a>
+                <a class="btn btn-primary" href="{% url 'reports:reports' %}">New Report</a>
                 {% if user.username == report.get_creator or request.user.is_superuser %}
+                    <a class="btn btn-info" href="{% url "reports:edit_report" report.id %}">Edit</a>
                     <a class="btn btn-danger" href="{% url "reports:delete_report" report.id %}">Delete</a>
                 {% endif %}
             </div>

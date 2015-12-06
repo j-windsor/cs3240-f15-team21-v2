@@ -16,7 +16,8 @@
                         <td><a href="{% url 'reports:read_report' report.id %}">{{ report.title }}</a></td>
                         <td>{{ report.public }}</td>
                         <td>{{ report.create_date }}</td>
-                        <td> Delete n' stuff</td>
+                        <td><a href="{% url "reports:edit_report" report.id %}">Edit</a> &nbsp; &nbsp;
+                        <a href="{% url "reports:delete_report" report.id %}">Delete</a></td>
                         <td>
                             <form id="folder_move_form" method="post" action="/reports/move/">
                                 {% csrf_token %}
@@ -33,8 +34,6 @@
                                 <input type="hidden" name="currep" value="{{ report.id }}">
                             </form>
                         </td>
-                        <td><a href="{% url "reports:edit_report" report.id %}">Edit</a></td>
-                        <td><a href="{% url "reports:delete_report" report.id %}">Delete</a></td>
                     </tr>
                 {% endfor %}
             </table>

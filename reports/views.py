@@ -211,7 +211,7 @@ def delete_attachment(request, attachment_id):
         return render(request, 'reports/read_report.html', {'report': report, "attachment_form": AttachmentForm()})
     except:
         messages.warning(request, "ERROR: Attachment Not Deleted!")
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER','/'))
 
 @login_required
 def search(request):
@@ -219,6 +219,22 @@ def search(request):
     found_entries = None
     found_entries_two = None
     if ('q' in request.GET) and request.GET['q'].strip():
+        if 'id_creator' is True:
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['creator'])
+        elif 'id_attach' is True :
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['name'])
+        elif 'id_report' is True :
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['title'])
+        elif 'id_folder' is True:
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['label'])
+        elif'id_folder' and 'id_report' and 'id_attach' and 'id_creator' is not True:
+            query_string = request.GET['q']
+            entry_query = get_query(query_string,  ['title', 'description',])
+        found_entries = Report.objects.filter(entry_query)
         query_string = request.GET['q']
         if "AND" in query_string:
             query_string = request.GET['q'].replace('AND','')
@@ -236,6 +252,10 @@ def search(request):
             found_entries_two = Report.objects.filter(entry_query_two)
             all_entries = found_entries | found_entries_two
 
+    if ('and' in 'q'):
+        print("hello!")
+    if('or' in 'q'):
+        print('hello!')
 
     return render_to_response('reports/search_results.html',
                               {'query_string': query_string, 'found_entries': all_entries},
@@ -289,7 +309,7 @@ def contributors(request, report_id):
 
         messages.success(request, "Added group members as contributors!")
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER','/'))
 
 @login_required
 def encrypt_attachment(request):

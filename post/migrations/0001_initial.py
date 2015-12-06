@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Message',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', primary_key=True, serialize=False)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
                 ('unread', models.BooleanField(default=True)),
                 ('encrypted', models.BooleanField(default=False)),
                 ('subject', models.CharField(max_length=30)),
-                ('content', models.CharField(max_length=500)),
+                ('content', models.BinaryField()),
                 ('key', models.CharField(max_length=80)),
                 ('send_date', models.DateField()),
                 ('recipient', models.ForeignKey(related_name='recipient', to=settings.AUTH_USER_MODEL)),

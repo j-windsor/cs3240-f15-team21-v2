@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group, User
+from .models import Security
 from reports.models import Folder, Report
 from Crypto import Random
 import random
@@ -51,15 +52,19 @@ def register(request):
             # Keys for post app
             random_generator = Random.new().read
             key = RSA.generate(1024, random_generator)
-            user.pem_key = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
-            user.public_key = key.publickey().exportKey('PEM', "password")
+            key_security = Security()
+            key_security.pem_key = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
+            key_security.public_key = key.publickey().exportKey('PEM', "password")
             email = EmailMessage('[SecureShare] Welcome to SecureShare!', 'Welcome to SecureShare '+user.first_name+'! Please save the attached PEM file in a safe place. You will need this to unencrypt any encrypted messages you receive.',
-            'secureshare21@yahoo.com',
+            'secureshare21uva@yahoo.com',
             [user.email])
-            email.attach('privatekey.pem', key.exportKey('PEM', user.pem_key), 'application/x-pem-file')
+            email.attach('privatekey.pem', key.exportKey('PEM', key_security.pem_key), 'application/x-pem-file')
             email.send()
 
             user.save()
+
+            key_security.user = user
+            key_security.save()
 
             # Update our variable to tell the template registration was successful.
             registered = True
