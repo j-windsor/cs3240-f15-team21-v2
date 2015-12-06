@@ -127,7 +127,6 @@ DATABASES = {
 # Enable Persistent Connections
 DATABASES['default']['CONN_MAX_AGE'] = 500
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 

@@ -5,11 +5,21 @@
     <br/>
     <div class="panel panel-default">
         <div class="panel-heading">My Groups</div>
-        <ul class="list-group">
+        <table class="table">
             {% for group in user.groups.all %}
-                <li class="list-group-item">{{ group.name }}</li>
+                <tr>
+                    <th class="list-group-item">{{ group.name }}</th>
+                    <td>
+                    Members:
+                    <ul>
+                        {% for member in group.user_set.all %}
+                            <li>{{ member.username }}</li>
+                        {% endfor %}
+                    </ul>
+                    </td>
+                </tr>
             {% endfor %}
-        </ul>
+        </table>
     </div>
     <br/>
     <h3>Create new group</h3>
