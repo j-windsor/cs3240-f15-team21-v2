@@ -1,6 +1,20 @@
 {% extends "master/base.html" %}
 {% block body_block %}
 
+<div class="well">
+    <form class="form-inline" method="get" action="/reports/search_reports">
+        <label for="id_q">Search For:</label>
+        {% csrf_token %}
+        <input type="radio" name="report" id="id_report" checked="checked"/>Reports
+        <input type="radio" name="folder" id="id_folder"/>Folders
+        <input type="radio" name="creator" id="id_creator"/>Creators
+        <input type="radio" name="attachment" id="id_attach"/>Attachments
+        <br>
+        <input type="text" class="form-control" name="q" id="id_q" size="45" placeholder="Enter Search Keywords"/>
+        <input type="submit" class="btn btn-default" class="form-control" value="Search"/>
+    </form>
+</div>
+
     {% if found_entries %}
         <div class="panel panel-default">
             <table class="table">
@@ -38,7 +52,8 @@
                 {% endfor %}
             </table>
         </div>
-
+    {% else %}
+    <h3> No entries were found. </h3>
     {% endif %}
 
 {% endblock %}

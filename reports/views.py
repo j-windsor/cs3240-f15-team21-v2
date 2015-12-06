@@ -155,19 +155,23 @@ def edit_folder(request, folder_id):
 @login_required
 def move(request):
     if request.method == 'POST':
-        if Folder.objects.get(id = request.POST['move_from']):
-            start = Folder.objects.get(id=request.POST['move_from'])
-            end = Folder.objects.get(id=request.POST['move_to'])
 
-            if start == end :
-                messages.warning(request, "You cannot move reports to their current folder!")
-                return HttpResponseRedirect('/')
-            else:
-                rep = Report.objects.get(id = request.POST['currep'])
-                Folder.objects.get(id = request.POST['move_to']).reports.add(rep)
-                Folder.objects.get(id = request.POST['move_from']).reports.remove(rep)
-                messages.success(request, 'Folder successfully moved!')
-                return HttpResponseRedirect('/')
+        rep = Report.objects.get(id = request.POST['currep'])
+
+        try:
+            Folder.objects.get(id = request.POST['move_to']).reports.add(rep)
+            Folder.objects.get(id = request.POST['move_from']).reports.remove(rep)
+            messages.success(request, 'Folder successfully moved!')
+        except:
+            Folder.objects.get(id = request.POST['move_to']).reports.add(rep)
+            messages.success(request, "here i am")
+
+            # f = rep.folder_set.all()
+            # move_from = f.filter(owner = request.user)
+            # Folder.objects.get(id = request.POST['move_to']).reports.add(rep)
+            # move_from.reports.remove(rep)
+            # messages.success(request, 'Folder successfully moved!')
+        return HttpResponseRedirect('/')
 
 
 @login_required
@@ -219,23 +223,25 @@ def search(request):
     found_entries = None
     found_entries_two = None
     if ('q' in request.GET) and request.GET['q'].strip():
-        if 'id_creator' is True:
+        search = request.GET['search_check']
+        if search == 'creator':
             query_string = request.GET['q']
-            entry_query = get_query(query_string,  ['creator'])
-        elif 'id_attach' is True :
+            entry_query = get_query(query_string,  ['creator_id__user'])
+        elif search == 'attach' :
             query_string = request.GET['q']
-            entry_query = get_query(query_string,  ['name'])
-        elif 'id_report' is True :
+            entry_query = get_query(query_string,  ['attachment'])
+        elif search == 'report' :
             query_string = request.GET['q']
             entry_query = get_query(query_string,  ['title'])
-        elif 'id_folder' is True:
+        elif search == 'folder':
             query_string = request.GET['q']
-            entry_query = get_query(query_string,  ['label'])
-        elif'id_folder' and 'id_report' and 'id_attach' and 'id_creator' is not True:
+            entry_query = get_query(query_string,  ['folder__label'])
+        else:
             query_string = request.GET['q']
             entry_query = get_query(query_string,  ['title', 'description',])
         found_entries = Report.objects.filter(entry_query)
         query_string = request.GET['q']
+
         if "AND" in query_string:
             query_string = request.GET['q'].replace('AND','')
 
@@ -251,11 +257,6 @@ def search(request):
             found_entries = Report.objects.filter(entry_query)
             found_entries_two = Report.objects.filter(entry_query_two)
             all_entries = found_entries | found_entries_two
-
-    if ('and' in 'q'):
-        print("hello!")
-    if('or' in 'q'):
-        print('hello!')
 
     return render_to_response('reports/search_results.html',
                               {'query_string': query_string, 'found_entries': all_entries},
