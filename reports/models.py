@@ -43,6 +43,8 @@ class Attachment (models.Model):
                 for report in folder.reports.all():
                     if self in report.attachment_set.all():
                         retval = True
+            if self.report.public = True:
+                retval = True
         except:
             pass
         return retval

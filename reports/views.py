@@ -223,22 +223,8 @@ def search(request):
     found_entries = None
     found_entries_two = None
     if ('q' in request.GET) and request.GET['q'].strip():
-        search = request.GET['search_check']
-        if search == 'creator':
-            query_string = request.GET['q']
-            entry_query = get_query(query_string,  ['creator_id__user'])
-        elif search == 'attach' :
-            query_string = request.GET['q']
-            entry_query = get_query(query_string,  ['attachment'])
-        elif search == 'report' :
-            query_string = request.GET['q']
-            entry_query = get_query(query_string,  ['title'])
-        elif search == 'folder':
-            query_string = request.GET['q']
-            entry_query = get_query(query_string,  ['folder__label'])
-        else:
-            query_string = request.GET['q']
-            entry_query = get_query(query_string,  ['title', 'description',])
+        query_string = request.GET['q']
+        entry_query = get_query(query_string,  ['title', 'description',])
         found_entries = Report.objects.filter(entry_query)
         query_string = request.GET['q']
 
