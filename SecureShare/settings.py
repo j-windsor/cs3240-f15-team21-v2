@@ -66,7 +66,7 @@ TINYMCE_DEFAULT_CONFIG = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.yahoo.com'
-EMAIL_HOST_USER = 'secureshare21uva@yahoo.com'
+EMAIL_HOST_USER = 'secureshare21uvaaaay@yahoo.com'
 EMAIL_HOST_PASSWORD = 'mygleeclubisafireman'
 EMAIL_PORT = 465
 #EMAIL_USE_TLS = True
