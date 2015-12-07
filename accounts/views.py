@@ -56,7 +56,7 @@ def register(request):
             key_security.pem_key = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
             key_security.public_key = key.publickey().exportKey('PEM', "password")
             email = EmailMessage('[SecureShare] Welcome to SecureShare!', 'Welcome to SecureShare '+user.first_name+'! Please save the attached PEM file in a safe place. You will need this to unencrypt any encrypted messages you receive.',
-            'secureshare21uva@yahoo.com',
+            'secureshare21uvaaaay@yahoo.com',
             [user.email])
             email.attach('privatekey.pem', key.exportKey('PEM', key_security.pem_key), 'application/x-pem-file')
             email.send()
