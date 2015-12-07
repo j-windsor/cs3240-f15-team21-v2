@@ -58,7 +58,7 @@
                                 <td>{{ attachment.encrypted }}</td>
                                 <td>{{ attachment.key }}</td>
                                 <td>{{ attachment.upload_date }}</td>
-                                <td><a href="{% url 'reports:delete_attachment' attachment.id %}">Delete</a> {% if not attachment.encrypted %}| <a href="{% url 'reports:api_download_attachment' attachment.id %}">Download</a>{% endif %}</td>
+                                <td>{% if user.username == report.get_creator or request.user.is_superuser %}<a href="{% url 'reports:delete_attachment' attachment.id %}">Delete</a>{% endfor %} {% if not attachment.encrypted %}| <a href="{% url 'reports:api_download_attachment' attachment.id %}">Download</a>{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </table>
