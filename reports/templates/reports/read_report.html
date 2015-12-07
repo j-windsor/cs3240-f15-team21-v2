@@ -2,7 +2,7 @@
 {% block body_block %}
 
     {% for folder in user.folder_set.all %}
-        {% if forloop.counter == 2 %}
+        {% if forloop.counter == 1 %}
             {% if report not in folder.reports.all and user.username != report.get_creator %}
                 <h4><p class="text-danger">This report was not shared with you.</p></h4>
 

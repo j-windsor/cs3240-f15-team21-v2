@@ -196,7 +196,7 @@ def read_report(request, report_id):
         #     return render(request, 'reports/read_report.html', {'report': report, "attachment_form": f})
     else:
         report = Report.objects.get(id=report_id)
-        if Report.objects.filter(creator=request.user):
+        if Report.objects.filter(creator=request.user) or report.is_public():
             report.save()
             attachment_form = AttachmentForm()
             return render(request, 'reports/read_report.html', {'report': report, "attachment_form": attachment_form})
