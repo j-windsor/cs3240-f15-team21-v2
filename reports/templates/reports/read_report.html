@@ -2,7 +2,7 @@
 {% block body_block %}
 
     {% for folder in user.folder_set.all %}
-        {% if forloop.counter == 2 %}
+        {% if forloop.counter == 1 %}
             {% if report not in folder.reports.all and user.username != report.get_creator %}
                 <h4><p class="text-danger">This report was not shared with you.</p></h4>
 
@@ -58,7 +58,7 @@
                                 <td>{{ attachment.encrypted }}</td>
                                 <td>{{ attachment.key }}</td>
                                 <td>{{ attachment.upload_date }}</td>
-                                <td>{% if user.username == report.get_creator or request.user.is_superuser %}<a href="{% url 'reports:delete_attachment' attachment.id %}">Delete</a>{% endfor %} {% if not attachment.encrypted %}| <a href="{% url 'reports:api_download_attachment' attachment.id %}">Download</a>{% endif %}</td>
+                                <td>{% if user.username == report.get_creator or request.user.is_superuser %}<a href="{% url 'reports:delete_attachment' attachment.id %}">Delete</a>{% endif %} {% if not attachment.encrypted %}| <a href="{% url 'reports:api_download_attachment' attachment.id %}">Download</a>{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </table>
